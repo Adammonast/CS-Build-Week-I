@@ -19,13 +19,12 @@ const newBoardStatus = (cellStatus = () => Math.random() < 0.3) => {
   return grid;
 };
 
-// Function that receives the state of the whole board status
-// Method that allows users to toggle the status of individual cells as props
+// Function that receives the state of the whole board status and toggle method
 const BoardGrid = ({ boardStatus, onToggleCellStatus }) => {
+  // Method that allows users to toggle the status of individual cells as props
   const handleClick = (row, column) => onToggleCellStatus(row, column);
 
   // Each cell is represented by a table’s <td>
-  // className attribute whose value depends on the boolean value of the corresponding board cell
   const tr = [];
   for (let row = 0; row < totalBoardRows; row++) {
     const td = [];
@@ -34,6 +33,7 @@ const BoardGrid = ({ boardStatus, onToggleCellStatus }) => {
       td.push(
         <td
           key={`${r},${c}`}
+          // className attribute whose value depends on the boolean value of the corresponding board cell
           className={boardStatus[row][column] ? "alive" : "dead"}
           onClick={() => handleClick(row, column)}
         />
@@ -67,9 +67,45 @@ const Slider = ({ speed, onSpeedChange }) => {
 };
 
 class App extends Component {
-  render() {
-    return <div></div>;
-  }
+  state = {
+    // When the game starts, the board’s cells status will be returned by the function that generates a new board status
+    boardStatus: newBoardStatus(),
+    // Generation starts at 0
+    generation: 0,
+    // Game runs when player decides
+    isGameRunning: false,
+    // Default speed is 500ms
+    speed: 500,
+  };
+
+  // Function that returns a different button element depending on the state of the game: running or stopped.
+  runStopButton = () => {
+    return this.state.isGameRunning ? (
+      <button type="button" onClick={this.handleStop}>
+        Stop
+      </button>
+    ) : (
+      <button type="button" onClick={this.handleRun}>
+        Start
+      </button>
+    );
+  };
+
+  // Clears the board sets the state for all cells to false, allowing for toggling individual cell status
+  handleClearBoard = () => {
+    this.setState({
+      boardStatus: newBoardStatus(() => false),
+      generation: 0,
+    });
+  };
+
+  // Clears the board and the status of each cell becomes by default a random boolean value
+  handleNewBoard = () => {
+    this.setState({
+      boardStatus: newBoardStatus(),
+      generation: 0,
+    });
+  };
 }
 
 export default App;
