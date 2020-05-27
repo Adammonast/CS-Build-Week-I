@@ -32,7 +32,7 @@ const BoardGrid = ({ boardStatus, onToggleCellStatus }) => {
       // Clicking on a cell results in the method being called with the cell’s row and column location as arguments
       td.push(
         <td
-          key={`${r},${c}`}
+          key={`${row},${column}`}
           // className attribute whose value depends on the boolean value of the corresponding board cell
           className={boardStatus[row][column] ? "alive" : "dead"}
           onClick={() => handleClick(row, column)}
@@ -105,6 +105,21 @@ class App extends Component {
       boardStatus: newBoardStatus(),
       generation: 0,
     });
+  };
+
+  // Method to handle player requests to toggle individual cell status
+  handleToggleCellStatus = (r, c) => {
+    const toggleBoardStatus = (prevState) => {
+      const clonedBoardStatus = JSON.parse(
+        JSON.stringify(prevState.boardStatus)
+      );
+      clonedBoardStatus[r][c] = !clonedBoardStatus[r][c];
+      return clonedBoardStatus;
+    };
+
+    this.setState((prevState) => ({
+      boardStatus: toggleBoardStatus(prevState),
+    }));
   };
 }
 
