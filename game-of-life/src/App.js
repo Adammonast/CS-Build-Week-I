@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 
 // Size of the board
-const totalBoardRows = 50;
-const totalBoardColumns = 50;
+const totalBoardRows = 25;
+const totalBoardColumns = 25;
 
 // The function’s parameter defaults to less than 30% chance of being alive
 const newBoardStatus = (cellStatus = () => Math.random() < 0.3) => {
@@ -74,8 +74,8 @@ class App extends Component {
     generation: 0,
     // Game runs when player decides
     isGameRunning: false,
-    // Default speed is 500ms
-    speed: 500,
+    // Default speed is 300ms
+    speed: 300,
   };
 
   // Function that returns a different button element depending on the state of the game: running or stopped.
@@ -108,19 +108,143 @@ class App extends Component {
   };
 
   // Method to handle player requests to toggle individual cell status
-  handleToggleCellStatus = (r, c) => {
+  handleToggleCellStatus = (row, column) => {
+    // Sets the states of the board status by calling a function and passing it the previous state as argument
     const toggleBoardStatus = (prevState) => {
+      // Deep clones the previous board’s status to avoid modifying it by reference when updating an individual cell
       const clonedBoardStatus = JSON.parse(
         JSON.stringify(prevState.boardStatus)
       );
-      clonedBoardStatus[r][c] = !clonedBoardStatus[r][c];
+      // Updates an individual cell
+      clonedBoardStatus[row][column] = !clonedBoardStatus[row][column];
+      // returns the updated cloned board status, effectively updating the status of the board
       return clonedBoardStatus;
     };
 
+    // Calls toggleBoardStatus
     this.setState((prevState) => ({
       boardStatus: toggleBoardStatus(prevState),
     }));
   };
+
+  handleStep = () => {
+    const nextStep = (prevState) => {
+      const boardStatus = prevState.boardStatus;
+      const clonedBoardStatus = JSON.parse(JSON.stringify(boardStatus));
+
+      // eight possible neighbors
+      const amountTrueNeighbors = (row, column) => {
+        const neighbors = [
+          [-1, -1],
+          [-1, 0],
+          [-1, 1],
+          [0, 1],
+          [1, 1],
+          [1, 0],
+          [1, -1],
+          [0, -1],
+        ];
+        // reduce neighbors, return new array of neighbors
+        return neighbors.reduce((trueNeighbors, neighbor) => {
+          const x = row + neighbor[0];
+          const y = column + neighbor[1];
+          // Calculates the amount of neighbors within the board with value true for an individual cell
+          const isNeighborOnBoard =
+            x >= 0 && x < totalBoardRows && y >= 0 && y < totalBoardColumns;
+          // No need to count more than 4 alive neighbors
+          if (trueNeighbors < 4 && isNeighborOnBoard && boardStatus[x][y]) {
+            return trueNeighbors + 1;
+          } else {
+            return trueNeighbors;
+          }
+        }, 0);
+      };
+
+      // Updates the cloned board’s individual cell status and returns the cloned board status
+      for (let row = 0; row < totalBoardRows; row++) {
+        for (let column = 0; column < totalBoardColumns; column++) {
+          const totalTrueNeighbors = amountTrueNeighbors(row, column);
+          if (!boardStatus[row][column]) {
+            if (totalTrueNeighbors === 3) clonedBoardStatus[row][column] = true;
+          } else {
+            if (totalTrueNeighbors < 2 || totalTrueNeighbors > 3)
+              clonedBoardStatus[row][column] = false;
+          }
+        }
+      }
+
+      return clonedBoardStatus;
+    };
+
+    // Sets the updated cloned board status to state
+    this.setState((prevState) => ({
+      boardStatus: nextStep(prevState),
+      // Adds one to the generation’s state to inform the player how many iterations have been produced so far
+      generation: prevState.generation + 1,
+    }));
+  };
+
+  render() {
+    const { boardStatus, isGameRunning, generation, speed } = this.state;
+
+    return (
+      <div>
+        <h1>Conway's Game of Life</h1>
+        <div className="container">
+          <div className="left">
+            <h3>{`Generation: ${generation}`}</h3>
+            <BoardGrid
+              boardStatus={boardStatus}
+              onToggleCellStatus={this.handleToggleCellStatus}
+            />
+          </div>
+          <div className="middle">
+            <span className="speedometer">
+              <h3>Game Speed</h3>
+              {"Max "}
+              <Slider speed={speed} onSpeedChange={this.handleSpeedChange} />
+              {" Min"}
+            </span>
+            <div className="buttons">
+              {this.runStopButton()}
+              <button
+                type="button"
+                disabled={isGameRunning}
+                onClick={this.handleStep}
+              >
+                Next
+              </button>
+              <button type="button" onClick={this.handleClearBoard}>
+                Clear
+              </button>
+              <button type="button" onClick={this.handleNewBoard}>
+                New Board
+              </button>
+            </div>
+          </div>
+          <div className="right">
+            <h2>Rules</h2>
+            <p>
+              Any live cell with fewer than two live neighbours dies, as if by
+              underpopulation
+            </p>
+            <p>
+              Any live cell with two or three live neighbours lives on to the
+              next generation
+            </p>
+            <p>
+              Any live cell with more than three live neighbours dies, as if by
+              overpopulation
+            </p>
+            <p>
+              Any dead cell with exactly three live neighbours becomes a live
+              cell, as if by reproduction
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
