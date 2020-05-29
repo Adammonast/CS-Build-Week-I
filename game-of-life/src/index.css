@@ -1,0 +1,74 @@
+body {
+  color: black;
+  background-color: #808080;
+}
+
+table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: #f5f5f5;
+}
+
+td {
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+}
+
+.alive {
+  background-color: black;
+}
+
+button {
+  width: 70%;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  margin: 5%;
+  padding: 5%;
+  font-size: 18px;
+  color: #f5f5f5;
+  background-color: #176f6b;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+h1 {
+  text-align: center;
+  margin: 2% 0 5% 0;
+}
+
+.left {
+  width: 35%;
+  text-align: center;
+}
+
+.speedometer {
+  text-align: center;
+  width: 25%;
+}
+
+.right {
+  width: 35%;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  margin: 20% 0 0 20%;
+}
+
+.bottom {
+  width: 70%;
+  margin: 2% 0 0 0;
+}
+
+h2 {
+  text-align: center;
+}

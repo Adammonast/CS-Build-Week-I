@@ -5,8 +5,8 @@ import "./index.css";
 const totalBoardRows = 25;
 const totalBoardColumns = 25;
 
-// The function’s parameter defaults to less than 30% chance of being alive
-const newBoardStatus = (cellStatus = () => Math.random() < 0.3) => {
+// The function’s parameter defaults to less than 40% chance of being alive
+const newBoardStatus = (cellStatus = () => Math.random() < 0.4) => {
   const grid = [];
   // The number of arrays within the main array will match the number of rows
   for (let row = 0; row < totalBoardRows; row++) {
@@ -56,7 +56,7 @@ const Slider = ({ speed, onSpeedChange }) => {
   return (
     <input
       type="range"
-      min="50"
+      min="0"
       max="1000"
       step="50"
       // current speed state
@@ -77,19 +77,6 @@ class App extends Component {
     isGameRunning: false,
     // Default speed is 300ms
     speed: 300,
-  };
-
-  // Function that returns a different button element depending on the state of the game: running or stopped.
-  runStopButton = () => {
-    return this.state.isGameRunning ? (
-      <button type="button" onClick={this.handleStop}>
-        Stop
-      </button>
-    ) : (
-      <button type="button" onClick={this.handleRun}>
-        Start
-      </button>
-    );
   };
 
   // Clears the board sets the state for all cells to false, allowing for toggling individual cell status
@@ -184,9 +171,23 @@ class App extends Component {
       generation: prevState.generation + 1,
     }));
   };
+  // Handles changing the game's speed
+  handleSpeedChange = (newSpeed) => {
+    this.setState({ speed: newSpeed });
+  };
+
+  // Handles starting the game
+  handleStart = () => {
+    this.setState({ isGameRunning: true });
+  };
+
+  // Handles stopping the game
+  handleStop = () => {
+    this.setState({ isGameRunning: false });
+  };
 
   // Stop or set a timer depending on different combinations of values
-  componentDidUpdate(prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const { isGameRunning, speed } = this.state;
     const speedChanged = prevState.speed !== speed;
     const gameStarted = !prevState.isGameRunning && isGameRunning;
@@ -211,7 +212,7 @@ class App extends Component {
 
     return (
       <div>
-        <h1>Conway's Game of Life</h1>
+        <h1>Jerry Conway's Game of Life</h1>
         <div className="container">
           <div className="left">
             <h3>{`Generation: ${generation}`}</h3>
@@ -224,12 +225,16 @@ class App extends Component {
             <span className="speedometer">
               <h3>Game Speed</h3>
               {"Max "}
-              <Slider speed={speed} />
+              <Slider speed={speed} onSpeedChange={this.handleSpeedChange} />
               {" Min"}
             </span>
             <div className="buttons">
-              <button type="button">Start</button>
-              <button type="button">Stop</button>
+              <button type="button" onClick={this.handleStart}>
+                Start
+              </button>
+              <button type="button" onClick={this.handleStop}>
+                Stop
+              </button>
               <button
                 type="button"
                 disabled={isGameRunning}
@@ -267,16 +272,42 @@ class App extends Component {
           <div className="bottom">
             <h2>About the Algorithm</h2>
             <p>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
+              The Game of Life, also known simply as Life, is a cellular
+              automaton devised by the British mathematician John Horton Conway
+              in 1970. It is a zero-player game, meaning that its evolution is
+              determined by its initial state, requiring no further input. One
+              interacts with the Game of Life by creating an initial
+              configuration and observing how it evolves. It is Turing complete
+              and can simulate a universal constructor or any other Turing
+              machine.
+            </p>
+            <p>
+              A cellular automaton consists of a regular grid of cells, each in
+              one of a finite number of states, such as on and off (in contrast
+              to a coupled map lattice). The grid can be in any finite number of
+              dimensions. For each cell, a set of cells called its neighborhood
+              is defined relative to the specified cell. An initial state (time
+              t = 0) is selected by assigning a state for each cell. A new
+              generation is created (advancing t by 1), according to some fixed
+              rule (generally, a mathematical function) that determines the new
+              state of each cell in terms of the current state of the cell and
+              the states of the cells in its neighborhood. Typically, the rule
+              for updating the state of cells is the same for each cell and does
+              not change over time, and is applied to the whole grid
+              simultaneously, though exceptions are known, such as the
+              stochastic cellular automaton and asynchronous cellular automaton.
+            </p>
+            <p>
+              In computability theory, a system of data-manipulation rules (such
+              as a computer's instruction set, a programming language, or a
+              cellular automaton) is said to be Turing-complete or
+              computationally universal if it can be used to simulate any Turing
+              machine. This means that this system is able to recognize or
+              decide other data-manipulation rule sets. Turing completeness is
+              used as a way to express the power of such a data-manipulation
+              rule set. Virtually all programming languages today are
+              Turing-complete. The concept is named after English mathematician
+              and computer scientist Alan Turing.
             </p>
           </div>
         </div>
