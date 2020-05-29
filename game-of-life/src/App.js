@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./index.css";
 
 // Size of the board
 const totalBoardRows = 25;
@@ -126,7 +127,7 @@ class App extends Component {
       boardStatus: toggleBoardStatus(prevState),
     }));
   };
-
+  // Handles the games progress, gets called on when making the next move
   handleStep = () => {
     const nextStep = (prevState) => {
       const boardStatus = prevState.boardStatus;
@@ -184,6 +185,27 @@ class App extends Component {
     }));
   };
 
+  // Stop or set a timer depending on different combinations of values
+  componentDidUpdate(prevState) {
+    const { isGameRunning, speed } = this.state;
+    const speedChanged = prevState.speed !== speed;
+    const gameStarted = !prevState.isGameRunning && isGameRunning;
+    const gameStopped = prevState.isGameRunning && !isGameRunning;
+
+    // Stops or starts timer
+    if ((isGameRunning && speedChanged) || gameStopped) {
+      clearInterval(this.timerID);
+    }
+
+    // The timer schedules a call to the handleStep method at the specified speed intervals
+    if ((isGameRunning && speedChanged) || gameStarted) {
+      this.timerID = setInterval(() => {
+        this.handleStep();
+      }, speed);
+    }
+  }
+
+  // Render method
   render() {
     const { boardStatus, isGameRunning, generation, speed } = this.state;
 
@@ -202,11 +224,12 @@ class App extends Component {
             <span className="speedometer">
               <h3>Game Speed</h3>
               {"Max "}
-              <Slider speed={speed} onSpeedChange={this.handleSpeedChange} />
+              <Slider speed={speed} />
               {" Min"}
             </span>
             <div className="buttons">
-              {this.runStopButton()}
+              <button type="button">Start</button>
+              <button type="button">Stop</button>
               <button
                 type="button"
                 disabled={isGameRunning}
@@ -218,7 +241,7 @@ class App extends Component {
                 Clear
               </button>
               <button type="button" onClick={this.handleNewBoard}>
-                New Board
+                Reset
               </button>
             </div>
           </div>
@@ -239,6 +262,21 @@ class App extends Component {
             <p>
               Any dead cell with exactly three live neighbours becomes a live
               cell, as if by reproduction
+            </p>
+          </div>
+          <div className="bottom">
+            <h2>About the Algorithm</h2>
+            <p>
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into
+              electronic typesetting, remaining essentially unchanged. It was
+              popularised in the 1960s with the release of Letraset sheets
+              containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of
+              Lorem Ipsum.
             </p>
           </div>
         </div>
